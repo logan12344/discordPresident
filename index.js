@@ -1,21 +1,23 @@
 const Discord = require('discord.js');
+const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
+
+const db_path = __dirname+'/Bot.db';
+const playlist = require('./commands/playList');
+const player = require('./commands/playMusic');
+const KickUser = require('./commands/KickUser');
+
 const client = new Discord.Client();
-const {CommandHandler} = require('djs-commands');
-const sqlite3 = require('sqlite3').verbose(), fs = require('fs');
 
-const handler = new CommandHandler({
-    folder: __dirname + '/commands/',
-    prefix: ['!']
-});
-const queue = new Map();
-
-if (fs.existsSync('./Bot.db')) {
-	db = new sqlite3.Database('./Bot.db', sqlite3.OPEN_READWRITE, function(err) {
+if (fs.existsSync(db_path)) {
+	var db = new sqlite3.Database(db_path, sqlite3.OPEN_READWRITE, function(err) {
 		if (err)
 			console.log(err.message);
 		else
-			console.log('Connected to the Bot database.');
+			console.error('Connected to the Bot database.');
 	});
+} else {
+    console.log("not found")
 }
 
 client.on('ready', async () => {
@@ -26,8 +28,19 @@ client.on('message', (message) => {
     if (message.author.type != 'bot' && message.channel.type != 'dm') {
         let command = message.content.split(' ', 1)[0];
         let args = message.content.slice(command.length + 1);
-        if (handler.getCommand(command)) {
-            handler.getCommand(command).run(message, args, db);
+        
+        switch (command) {
+            case '!playlist':
+                playlist.exec(message, args, db);
+                break;
+            case '!p':
+                player.exec(message, args);
+                break;
+            case '!k':
+                KickUser.exec(message, args);
+                break;
+            default:
+                break;
         }
     }
 });
