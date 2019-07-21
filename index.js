@@ -46,11 +46,15 @@ client.on('message', (message) => {
             case '!st':
                 player.exec(command, message, args);
                 break;
+            case '!lustration':
+            case '!amnesty':
             case '!k':
-                KickUser.exec(message, args);
+                KickUser.exec(command, message, args);
                 break;
             default:
-                break;
+                if (command.slice(0,1) == '!'){
+                    message.channel.send('Usage:\n !p - play \n !sk - skip \n !st - stop \n !k - vote for user kick from voice channel');
+                }
         }
     }
 });
