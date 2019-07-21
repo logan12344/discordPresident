@@ -24,6 +24,14 @@ client.once('ready', async () => {
    client.user.setActivity('Посади корупціонера', { type: 'PLAYING' });
 });
 
+client.once('reconnecting', () => {
+    console.log('Reconnecting!');
+});
+
+client.once('disconnect', () => {
+    console.log('Disconnect!');
+});
+
 client.on('message', (message) => {
     if (message.author.type != 'bot' && message.channel.type != 'dm') {
         let command = message.content.split(' ', 1)[0];
@@ -34,7 +42,9 @@ client.on('message', (message) => {
                 playlist.exec(message, args, db);
                 break;
             case '!p':
-                player.exec(message, args);
+            case '!sk':
+            case '!st':
+                player.exec(command, message, args);
                 break;
             case '!k':
                 KickUser.exec(message, args);
