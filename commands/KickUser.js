@@ -25,9 +25,9 @@ exports.exec = async (message, args) => {
 		setTimeout(function(user, channel){
 			channel.overwritePermissions(user, {'CONNECT' : true});
 		}, 10000, userForKick, message.member.voiceChannel);
-		const temp_channel = await message.guild.createChannel('1', 'voice', [
-		  { id: userForKick.id,
-			deny: ['VIEW_CHANNEL', 'CONNECT', 'SPEAK'] }
+		const temp_channel = await message.guild.createChannel('1', 'voice',
+			[{ id: userForKick.id,
+			deny: ['VIEW_CHANNEL', 'CONNECT', 'SPEAK']}
 		]);
 		await userForKick.setVoiceChannel(temp_channel);
 		await temp_channel.delete();

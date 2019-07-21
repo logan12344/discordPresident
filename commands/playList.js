@@ -24,7 +24,7 @@ exports.exec = async (message, args, db) => {
 			db.all(sql, [], function(err, rows) {
 				if (err)
 					console.log(err);
-					player.play(message.member.voiceChannel, message.channel, rows[0].URL, rows[0].Name);
+				player.play(message.member.voiceChannel, message.channel, rows[0].URL, rows[0].Name);
 			});
 		}
 		if(command == 's'){

@@ -20,7 +20,7 @@ if (fs.existsSync(db_path)) {
     console.log("not found")
 }
 
-client.on('ready', async () => {
+client.once('ready', async () => {
    client.user.setActivity('Посади корупціонера', { type: 'PLAYING' });
 });
 

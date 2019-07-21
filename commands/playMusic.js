@@ -13,15 +13,13 @@ exports.exec = async (message, args) => {
 		search(args, opts, async function(err, results) {
 			if(err)
 				return console.log(err);
-			
-			var links = JSON.parse(JSON.stringify(results));
-			if(links != undefined){
+			if(results != undefined){
 				for(var i = 0; i < opts.maxResults; i++){
-					if(links[i].kind == 'youtube#channel')
+					if(results[i].kind == 'youtube#channel' || results[i].kind == 'youtube#playlist')
 						continue;
 					else{
-						stream = ytdl(links[i].link, { filter : 'audioonly' });
-						nowPlaying = links[i].link;
+						stream = ytdl(results[i].link, { filter : 'audioonly' });
+						nowPlaying = results[i].link;
 						break;
 					}
 				}
