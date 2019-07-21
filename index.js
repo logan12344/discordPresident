@@ -39,12 +39,10 @@ client.on('message', (message) => {
         
         switch (command) {
             case '!playlist':
-                playlist.exec(message, args, db);
-                break;
             case '!p':
             case '!sk':
             case '!st':
-                player.exec(command, message, args);
+                player.exec(command, message, args, db);
                 break;
             case '!lustration':
             case '!amnesty':

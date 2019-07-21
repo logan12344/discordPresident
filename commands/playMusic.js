@@ -1,16 +1,15 @@
 const search = require('youtube-search');
 const ytdl = require('ytdl-core');
-
+const queue = new Map();
 var opts = {
 	maxResults: 10,
 	key: 'AIzaSyCDHd_dOmLrAvClnQfvh56pJASBcT7eMOA'
 };
-const queue = new Map();
-exports.play = play;
 
-exports.exec = async (command, message, args) => {
+exports.exec = async (command, message, args, db) => {
 	const serverQueue = queue.get(message.guild.id);
-
+	let number = args.split(' ', 1)[0];
+	let body = args.slice(number.length + 1);	
 	if (command == '!p') {
 		preparePlay(message, serverQueue, args);
 		return;
@@ -20,6 +19,40 @@ exports.exec = async (command, message, args) => {
 	} else if (command == '!st') {
 		stop(message, serverQueue);
 		return;
+	} else if(command == '!playlist'){
+		if(number == ''){
+			let sql = 'SELECT id, Name FROM PlayList';
+			var result = '';
+			db.all(sql, [], function(err, rows) {
+				if (err)
+					console.log(err);
+				rows.forEach(function(row) {
+					result += '✨ '+ row.id + '. ' + row.Name + '\n';
+				});
+				message.channel.send(result);
+			});
+		}
+		else{
+			if(number == 'p'){
+				let sql = 'SELECT URL, Name FROM PlayList WHERE id = ' + parseInt(body, 10);
+				var song;
+				db.all(sql, [], function(err, rows) {
+					if (err)
+						console.log(err);
+					song = {
+						title: rows[0].Name,
+						url: rows[0].URL
+					};
+					queueSong(message, serverQueue, song);
+					return;
+				});
+			}
+			if(number == 's'){
+				let URL = body.split(' ', 1)[0];
+				let name = body.slice(URL.length + 1);
+				db.run('INSERT INTO PlayList(URL, Name) VALUES(?, ?)', [URL, name]);
+			}
+		}
 	}
 }
 
@@ -70,7 +103,7 @@ async function queueSong(message, serverQueue, song){
 			connection: null,
 			songs: [],
 			volume: 5,
-			playing: true,
+			playing: true
 		};
 
 		queue.set(message.guild.id, queueContruct);
@@ -79,6 +112,7 @@ async function queueSong(message, serverQueue, song){
 		try {
 			var connection = await message.member.voiceChannel.join();
 			queueContruct.connection = connection;
+			message.channel.send('Playing 🔥 ' + song.title + '🔥');
 			play(message.guild, queueContruct.songs[0]);
 		} catch (err) {
 			console.log(err);
@@ -87,8 +121,7 @@ async function queueSong(message, serverQueue, song){
 		}
 	} else {
 		serverQueue.songs.push(song);
-		console.log(serverQueue.songs);
-		return message.channel.send(`${song.title} has been added to the queue!`);
+		return message.channel.send('🎶 ' + song.title + ' 🎶 has been added to the queue!');
 	}
 }
 
@@ -116,7 +149,8 @@ function play(guild, song) {
 function skip(message, serverQueue) {
 	if (!message.member.voiceChannel) 
 		return message.channel.send('You have to be in a voice channel to stop the music!');
-	if (!serverQueue) return message.channel.send('There is no song that I could skip!');
+	if (!serverQueue) 
+		return message.channel.send('There is no song that I could skip!');
 	serverQueue.connection.dispatcher.end();
 }
 
@@ -125,5 +159,4 @@ function stop(message, serverQueue) {
 		return message.channel.send('You have to be in a voice channel to stop the music!');
 	serverQueue.songs = [];
 	serverQueue.connection.dispatcher.end();
-}
-	
+}	
