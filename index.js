@@ -1,11 +1,6 @@
-const Discord = require('discord.js');
-const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
+const Discord = require('discord.js'), sqlite3 = require('sqlite3').verbose(), fs = require('fs');
 
-const db_path = __dirname+'/Bot.db';
-const playlist = require('./commands/playList');
-const player = require('./commands/playMusic');
-const KickUser = require('./commands/KickUser');
+const db_path = __dirname +'/Bot.db', player = require('./commands/playMusic'), KickUser = require('./commands/KickUser'), config = require('./config.json');
 
 const client = new Discord.Client();
 
@@ -16,9 +11,8 @@ if (fs.existsSync(db_path)) {
 		else
 			console.error('Connected to the Bot database.');
 	});
-} else {
+} else
     console.log("not found")
-}
 
 client.once('ready', async () => {
    client.user.setActivity('Посади корупціонера', { type: 'PLAYING' });
@@ -42,6 +36,7 @@ client.on('message', (message) => {
             case '!p':
             case '!sk':
             case '!st':
+            case '!l':
                 player.exec(command, message, args, db);
                 break;
             case '!lustration':
@@ -51,10 +46,10 @@ client.on('message', (message) => {
                 break;
             default:
                 if (command.slice(0,1) == '!'){
-                    message.channel.send('Usage:\n !p - play \n !sk - skip \n !st - stop \n !k - vote for user kick from voice channel');
+                    message.channel.send('Usage:\n !p - play \n !sk - skip \n !st - stop \n !l - list \n !k - vote for user kick from voice channel');
                 }
         }
     }
 });
 
-client.login('NjAwNzI1NDc5MzIxNzYzODQz.XS7WqA.DtyzQXbmoylquXf90aj_aDLeurk');
+client.login(config.discordToken);
