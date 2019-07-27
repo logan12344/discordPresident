@@ -4,17 +4,23 @@ exports.exec = async (command, message, args) => {
 	var userChannelId = message.member.voiceChannelID;
 
 	if (command == '!lustration'){
-		let random_user;
+		/*let random_user;
 		do {
 			random_user = message.member.voiceChannel.members.random();
 		} while (random_user.id != message.client.user.id);
-		random_user.ban();
+		random_user.ban();*/
+		
 	}
 
 	if (command == '!amnesty'){
 		message.guild.fetchBans().then(bans => {
 			bans.tap(user => {
-				console.log(user.username);
+				message.guild.unban(user);
+				user.createDM().then(channel => {
+					message.channel.createInvite().then(invite => {
+						channel.send(invite.url);
+					});
+				});
 			});
 		});
 	}
